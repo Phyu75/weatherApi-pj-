@@ -1,0 +1,268 @@
+<html>
+<head>
+
+<!-- CSS only -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+	<title>TYping Game</title>
+	</head>
+	<style type="text/css">
+
+		body{
+			font-family: sans-serif;
+			height: 100vh;
+			margin: 0 auto;
+			text-align: center;
+			background-image:url("white.svg");
+			background-repeat: no-repeat;
+			background-position:center;
+			background-size: cover;
+
+		}
+		.statusBar{
+			padding: 15px;
+			background: white;
+			color: white;
+		}
+		h1{
+			font-size: 28px;
+			padding: 10px;
+		}
+		.bar{
+			padding: 15px;
+			background: #03a9f4;
+			color: white;
+			box-shadow: 0px 0px 0px gray;
+		}
+		p{
+			display: inline-block;
+		}
+		#score,#time{
+			background: red;
+			padding: 7px 15px 8px 15px;
+			margin-left: 5px;
+			border-bottom-right-radius: 10px;
+		}
+		h3{
+			font-size: 21px;
+			display: inline-block;
+			margin-top: 1px;
+			background: black;
+			padding: 7px 0px 7px 15px;
+			border-bottom-left-radius: 0px;
+			margin-right: 10px;
+		}
+		p, .form-control{
+			font-size: 20px;
+		}
+		textarea{
+			width: 20%;
+			padding: 1%;
+			font-size: 20px;
+		}
+		.alert{
+			margin: 0px;
+		}
+		#gameStatus {
+			display: none;
+		}
+		#playAgain{
+			display: none;
+		}
+
+		
+
+
+		
+	</style>
+	<div class="alert alert warning" role="alert" style="font-size: 20px";>
+		<span id="timeInterval"> Hello Good Afternoon</span><button class="btn btn-outline-warning" onclick="popUp()" id="show">User</button>
+	</div>
+	<body oncontextmenu="return true">
+		<div class="bar">
+			<h1>Typing Game</h1>
+
+<body>
+	<div class="bar">
+
+<h3>
+	<span>Score</span>
+	<span id="score">0</span>
+</h3>
+<h3>
+	<span>Time</span>
+	<span id="time">0<span>
+	</h3>
+</div>
+
+ 
+	<div class="container">
+		<div class="row">
+			<div class="col-12 col-md-8 col-lg-6 mx-auto text-centre">
+				<p id="random" class="mt-5"  oncopy="return false"></p>
+				<p id="gameStatus" class="mt-5"></p>
+				<button class="btn btn-outline-primary mb-3" id="skip" onclick="skip()">Skip</button>
+				<button  class="btn btn-primary mb-3"id="PlayAgain">Play Again</button>
+				<textarea onpaste="return false" id="typeWord" placeholder="Type the above sentences" class="form-control mt-3"></textarea>
+	</div>
+	    </div>
+	         </div>
+
+</body>
+</html>
+
+
+
+
+
+
+	<script>
+		let random= document.querySelector("#random");
+		const url ="https://game-of-thrones-quotes.herokuapp.com/v1/random/5";
+
+		async function getData(){
+			let response= await fetch (url);
+		    let data = await response.json();
+		    let randomWord= Math.floor(Math.random()* data.length)
+		    random.innerHTML=data[randomWord].sentence;
+		   }
+		   getData();
+
+		   function skip(){
+		   	getData();
+		   }
+		let typeWord = document.querySelector("#typeWord");
+		let displayScore = document.querySelector("#score");
+		let score = 0;
+		let storedPoints ;
+
+		typeWord.addEventListener("keyup", () => {
+			if(typeWord.value.trim() === random.innerText){
+				score ++;
+				displayScore.innerHTML = score;
+				getData();
+				typeWord.value="";
+				let extraTime=[3,5,8,10,12,15];
+				let randomNumber = Math.floor(Math.random()*extraTime.length);
+				let randomTime = extraTime[randomNumber];
+				time+= randomTime;
+				localStorage.setItem("storedScore",score);
+				storedPoints=localStorage.getItem("storedScore");
+				localStorage.setItem("storedTime",time);
+				showTime.innerHTML = time + "s";
+
+			}
+			let day = date.getDay();
+			let month= date.getMonth();
+			let year = date.getFullYear();
+			let monthName = ["January","Febuary","March","April","May","June","July","August","September","November","December"]
+			let lastPlayDate = `${day}, ${monthName[month]} ,${year}`;
+			localStorage.setItem("lastDate",lastPlayDate);
+		})
+
+			let time = 30;
+			let showTime = document.querySelector("#time");
+			function displayTime(){
+				time -- ;
+				var storedSeconds = localStorage.getItem("storedTime");
+				showTime.innerHTML = time + "s";
+				if (!storedSeconds){
+					localStorage.setItem("storedTime",time);
+				}
+				if (time == 0){
+					clearInterval (counter);
+					localStorage.setItem("storedTime",0);
+					showTime.innerHTML = storedSeconds + "s";
+					gameOver()
+				}
+				getStored();
+				if (storedPoints >= 5){
+					showTime.innerHTML = storedSeconds + "s";
+					gameWin()
+				}
+			}
+		storedPoints = localStorage.getItem("storedScore");
+		let gameStatus = document.getElementById("gameStatus");
+
+		function getStored(){
+			if (storedPoints){
+				displayScore.innerHTML = storedPoints;
+
+			}else{
+				displayScore.innerHTML = 0;
+			}
+		}
+		 let counter = setInterval(displayTime , 1000);
+		 let skipButton = document.querySelector("#skip");
+		 let playAgain = document.querySelector("#playAgain");
+		 function gameOver(){
+		 	random.style.display ="none";
+		 	gameStatus.style.display ="block";
+		 	gameStatus.innerHTML ="You lose, Time Run Out!!";
+		 	typeWord.style.display ="none";
+		 	skipButton.style.display="none";
+		 	playAgain.style.display ="inline-block";
+		 	clearInterval(counter);
+
+		 }
+
+		 function gameWin(){
+		 	random.style.display ="none";
+		 	gameStatus.style.display ="block";
+		 	let lastPlay=localStorage.getItem("lastDate");
+		 	gameStatus.innerHTML =`You Won!! You are a good typer! <br><br>
+		 	                        last Play Date:${lastPlay}`;
+		 	 
+		 	typeWord.style.display="none";
+		 	skipButton.style.display="none";
+		 	playAgain.style.display ="inline-block";
+		 	clearInterval(counter);
+		 }
+		 playAgain.addEventListener("click",()=>{
+		 	window.location.reload();
+		 	playAgain.style.display="none";
+		 	localStorage.removeItem("storedScore");
+		 	localStorage.removeItem("storedSeconds");
+
+		 })
+		 let date=new Date();
+		   let hours=date.getHours();
+		   let timeInterval=document.getElementById("timeInterval");
+	        if(hours >= 1 && hours <=5){
+	        	timeInterval.innerHTML="Hello Early Morning🥱";
+		   	
+		   }else if (hours >= 6 && hours <= 12){
+		   	timeInterval.innerHTML="Hello Good Morning🌞 ";
+		   	
+		   }else if (hours >= 12 && hours <= 14){
+		   	timeInterval.innerHTML="Hello Good Afternoon☀️";
+		   	
+		   }else if (hours >= 15 && hours <= 18){
+		   	timeInterval.innerHTML="Hello Good Evening🌤";
+		  	
+		   }else if (hours >= 19 && hours <= 24 || hours == 0){
+		   	timeInterval.innerHTML="Hello Good Night🌙";
+		   	
+		   
+		   }else{
+		   	timeInterval.innerHTML = "Hello, Warmly welcome to ";
+		   }
+
+               
+let showUser = document.querySelector("#show");
+function popUp(){
+  let username = prompt("What is your name ?");
+  localStorage.setItem("storedUser", username );
+  showUser.innerHTML = username;
+}
+		   let storedUser=localStorage.getItem("storedUser")
+
+			if(storedUser){
+	   		    showUser.innerHTML=storedUser;
+		   	}else{
+		  		showUser.innerHTML="User";
+		   	}
+
+
+	</script>
+
